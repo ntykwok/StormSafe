@@ -135,15 +135,17 @@ contract DynamicNFT is ERC721, ChainlinkClient, Ownable {
         require(!paused);
 
         bool goodstring = false;
+        uint256 city_id = 0;
 
         for (uint i = 0; i < 5; i++) {
             string memory _check = cities[i];
             if (keccak256(abi. encodePacked(_city)) == keccak256(abi. encodePacked(_check))) {
                 goodstring = true;
+                city_id = i;
             }
         }
         require(goodstring, "Insurance contract does not cover this city.");
-        require(eth_equity[msg.sender] > getPrice(_tier), "Insufficient balance.");
+        require(eth_equity[msg.sender] >= getPrice(_tier), "Insufficient balance.");
 
         eth_equity[msg.sender] -= getPrice(_tier);
         
@@ -151,10 +153,10 @@ contract DynamicNFT is ERC721, ChainlinkClient, Ownable {
         _safeMint(msg.sender, _tokenIdCounter.current());
         uint256 time = block.timestamp;
         uint256 bday = time;
-        uint256 expiry = time + 1000;
+        uint256 expiry = time + 86400;
         uint256 price = getPrice(_tier);
         uint256 claim = getClaim(_tier);
-        uint256 temp = 0;
+        uint256 temp = city_temps[city_id];
         bool validity = true;
 
         // assign and alter metadata of NFT
